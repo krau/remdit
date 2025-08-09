@@ -45,11 +45,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract version from Git Ref
-        id: extract_version
+      - name: Extract meta from Git Ref
+        id: extract_meta
         run: |
           VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\/v//')
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "commit_date=$(git show -s --format=%cI)" >> "$GITHUB_OUTPUT"
 
       - name: Release Go Binary
         uses: wangyoucao577/go-release-action@v1
@@ -61,7 +62,7 @@ jobs:
           ldflags: >-
             -s -w
             -X "github.com/krau/remdit/config.Version=${{ env.VERSION }}"
-            -X "github.com/krau/remdit/config.BuildTime=${{ format(github.event.repository.updated_at, 'yyyy-MM-dd HH:mm:ss') }}"
+            -X "github.com/krau/remdit/config.BuildTime=${{ steps.extract_meta.outputs.commit_date }}"
             -X "github.com/krau/remdit/config.Commit=${{ github.sha }}"
             -X "github.com/krau/remdit/config.defaultServer=${{ secrets.REMDIT_DEFAULT_SERVER }}"
           binary_name: remdit
