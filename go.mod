@@ -9,10 +9,19 @@ require (
 	github.com/spf13/viper v1.20.1
 )
 
-require github.com/kr/fs v0.1.0 // indirect
+require (
+	github.com/google/go-github/v30 v30.1.0 // indirect
+	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf // indirect
+	github.com/kr/fs v0.1.0 // indirect
+	github.com/tcnksm/go-gitconfig v0.1.2 // indirect
+	github.com/ulikunitz/xz v0.5.9 // indirect
+	golang.org/x/oauth2 v0.25.0 // indirect
+)
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
+	github.com/blang/semver v3.5.1+incompatible
 	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
@@ -28,6 +37,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/pkg/sftp v1.13.9
+	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

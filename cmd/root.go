@@ -25,6 +25,12 @@ var rootCmd = &cobra.Command{
 			fmt.Println("Commit:", config.Commit)
 			os.Exit(0)
 		}
+		if cmd.Flags().Changed("upgrade") {
+			if err := Upgrade(); err != nil {
+				fmt.Println("Failed to upgrade:", err)
+				os.Exit(1)
+			}
+		}
 		if len(args) == 0 {
 			return nil
 		}
@@ -68,6 +74,7 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.Flags().BoolP("verbose", "v", false, "enable verbose output")
 	rootCmd.Flags().BoolP("version", "V", false, "print version information")
+	rootCmd.Flags().BoolP("upgrade", "u", false, "upgrade remdit to the latest version")
 }
 
 func run(ctx context.Context, fp string) {
