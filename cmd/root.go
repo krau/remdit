@@ -20,6 +20,12 @@ var rootCmd = &cobra.Command{
 	Short:   "A collaborative text editor for remote files",
 	Example: "remdit file.json",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if cmd.Flags().Changed("version") {
+			fmt.Println("remdit version:", config.Version)
+			fmt.Println("Build time:", config.BuildDate)
+			fmt.Println("Commit:", config.Commit)
+			os.Exit(0)
+		}
 		if len(args) == 0 {
 			return nil
 		}
@@ -62,7 +68,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Flags().BoolP("verbose", "v", false, "enable verbose output")
-	rootCmd.AddCommand(versionCmd)
+	rootCmd.Flags().BoolP("version", "V", false, "print version information")
 }
 
 func run(ctx context.Context, fp string) {
