@@ -63,6 +63,7 @@ jobs:
             -X "github.com/krau/remdit/config.Version=${{ env.VERSION }}"
             -X "github.com/krau/remdit/config.BuildTime=${{ format(github.event.repository.updated_at, 'yyyy-MM-dd HH:mm:ss') }}"
             -X "github.com/krau/remdit/config.Commit=${{ github.sha }}"
+            -X "github.com/krau/remdit/config.defaultServer=${{ secrets.REMDIT_DEFAULT_SERVER }}"
           binary_name: remdit
         env:
           VERSION: ${{ env.VERSION }}
