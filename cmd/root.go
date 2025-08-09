@@ -62,6 +62,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Flags().BoolP("verbose", "v", false, "enable verbose output")
+	rootCmd.AddCommand(versionCmd)
 }
 
 func run(ctx context.Context, fp string) {
