@@ -116,7 +116,7 @@ func run(ctx context.Context, fp string) {
 		return
 	}
 	logger.Debugf("file info retrieved: %v", fileinfo)
-	logger.Infof("Edit URL: %s\n\n", fileinfo.EditUrl)
+	logger.Infof("Edit URL For %s: %s\nDO NOT SHARE TO STRANGERS!", filepath.Base(fp), fileinfo.EditUrl)
 	logger.Debug("listening for server events")
 	if err := client.ListenServer(); err != nil {
 		logger.Error("failed to listen for server events", "error", err)

@@ -8,5 +8,5 @@ type FileInfoPayload struct {
 }
 
 func (f FileInfoPayload) String() string {
-	return fmt.Sprintf("Your edit url: %s , DO NOT SHARE TO STRANGERS!", f.EditUrl)
+	return fmt.Sprintf("FileID: %s, EditUrl: %s", f.FileID, f.EditUrl)
 }
