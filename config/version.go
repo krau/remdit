@@ -1,7 +1,6 @@
 package config
 
 var (
-	Version   = "dev"
-	Commit    = "unknown"
-	BuildDate = "unknown"
+	Version = "dev"
+	Commit  = "unknown"
 )

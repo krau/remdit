@@ -21,8 +21,7 @@ var rootCmd = &cobra.Command{
 	Example: "remdit file.json",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if cmd.Flags().Changed("version") {
-			fmt.Println("remdit version:", config.Version)
-			fmt.Println("Build time:", config.BuildDate)
+			fmt.Println("Remdit Version:", config.Version)
 			fmt.Println("Commit:", config.Commit)
 			os.Exit(0)
 		}
