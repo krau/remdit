@@ -66,7 +66,7 @@ func (c *Client) Connect() error {
 		return fmt.Errorf("failed to establish SSH connection: %w", err)
 	}
 	c.globalReqs = reqs
-	c.client = ssh.NewClient(sshconn, chans, reqs)
+	c.client = ssh.NewClient(sshconn, chans, nil)
 	return nil
 }
 
