@@ -49,9 +49,14 @@ jobs:
       - name: Extract meta from Git Ref
         id: extract_meta
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\/v//')
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            VERSION=$(echo "${{ github.ref }}" | sed 's/refs\/tags\/v//')
+          else
+            VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
+          fi
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "commit_date=$(git show -s --format=%cI)" >> "$GITHUB_OUTPUT"
+
 
       - name: Release Go Binary
         uses: wangyoucao577/go-release-action@v1
