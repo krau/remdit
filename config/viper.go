@@ -18,8 +18,8 @@ type Config struct {
 }
 
 type Server struct {
-	Addr     string `mapstructure:"addr" toml:"addr" json:"addr"`
-	Password string `mapstructure:"password" toml:"password" json:"password"`
+	Addr string `mapstructure:"addr" toml:"addr" json:"addr"`
+	Key  string `mapstructure:"key" toml:"key" json:"key"`
 }
 
 func (s *Server) Valid() bool {

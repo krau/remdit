@@ -9,9 +9,10 @@ import (
 	"path/filepath"
 
 	"github.com/charmbracelet/log"
-	"github.com/duke-git/lancet/v2/fileutil"
-	"github.com/krau/remdit/client/ssh"
+	"github.com/coder/websocket"
+	"github.com/krau/remdit/client"
 	"github.com/krau/remdit/config"
+	"github.com/krau/remdit/fileutil"
 	"github.com/spf13/cobra"
 )
 
@@ -98,29 +99,30 @@ func run(ctx context.Context, fp string) {
 	selectedServer := validServers[rand.Intn(len(validServers))]
 	logger.Debug("selected server", "addr", selectedServer.Addr)
 
-	client := ssh.NewClient(ctx, selectedServer, fp)
+	client := client.NewClient(ctx, selectedServer, fp)
+	if err := client.CreateSession(); err != nil {
+		logger.Error("failed to create session", "error", err)
+		return
+	}
 	if err := client.Connect(); err != nil {
 		logger.Error("failed to connect to server", "addr", selectedServer.Addr, "error", err)
 		return
 	}
-	defer client.Close()
 	logger.Debug("connected to server", "addr", selectedServer.Addr)
-	if err := client.UploadFile(); err != nil {
-		logger.Error("failed to upload file to server", "addr", selectedServer.Addr, "error", err)
-		return
-	}
-	logger.Debug("file uploaded successfully", "filepath", fp)
-	fileinfo, err := client.GetUploadedFileInfo()
+	editUrl := client.GetEditURL()
+	logger.Infof("Edit URL for file %s: %s\nDO NOT SHARE TO STRANGERS!", filepath.Base(fp), editUrl)
+
+	err := client.HandleMessages()
 	if err != nil {
-		logger.Error("failed to get file info", "error", err)
+		logger.Error("error handling messages", "error", err)
+		if closeErr := client.Close(websocket.StatusInternalError, err.Error()); closeErr != nil {
+			logger.Error("failed to close connection", "error", closeErr)
+		}
 		return
 	}
-	logger.Debugf("file info retrieved: %v", fileinfo)
-	logger.Infof("Edit URL For %s: %s\nDO NOT SHARE TO STRANGERS!", filepath.Base(fp), fileinfo.EditUrl)
-	logger.Debug("listening for server events")
-	if err := client.ListenServer(); err != nil {
-		logger.Error("failed to listen for server events", "error", err)
-		return
+	logger.Debug("session ended")
+	if err := client.Close(websocket.StatusNormalClosure, ""); err != nil {
+		logger.Error("failed to close connection", "error", err)
 	}
 }
 
