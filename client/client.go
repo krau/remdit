@@ -38,20 +38,22 @@ func NewClient(ctx context.Context, serverConf config.Server, filePath string) *
 		l:          log.FromContext(ctx).WithPrefix("client"),
 	}
 }
-
 func (c *Client) CreateSession() error {
 	u, err := url.Parse(c.serverConf.Addr)
 	if err != nil {
 		return fmt.Errorf("failed to parse server URL: %w", err)
 	}
-	if !strings.HasPrefix(u.String(), "http") {
-		u, err = url.Parse("http://" + u.String())
-		c.serverConf.Addr = u.String()
+
+	if !strings.HasPrefix(u.String(), "http://") && !strings.HasPrefix(u.String(), "https://") {
+		u, err = url.Parse("https://" + u.String())
 		if err != nil {
-			return fmt.Errorf("failed to parse server URL with http prefix: %w", err)
+			return fmt.Errorf("failed to parse server URL with https prefix: %w", err)
 		}
+		c.serverConf.Addr = u.String()
 	}
+
 	u = u.JoinPath("api", "session")
+
 	file, err := os.Open(c.filePath)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
@@ -70,7 +72,9 @@ func (c *Client) CreateSession() error {
 		return fmt.Errorf("failed to copy file: %w", err)
 	}
 
-	writer.Close()
+	if err := writer.Close(); err != nil {
+		return fmt.Errorf("failed to close multipart writer: %w", err)
+	}
 
 	req, err := http.NewRequestWithContext(c.ctx, http.MethodPost, u.String(), &buf)
 	if err != nil {
@@ -88,10 +92,16 @@ func (c *Client) CreateSession() error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
 		if resp.StatusCode == http.StatusUnauthorized {
-			return fmt.Errorf("unauthorized: check your API key")
+			return fmt.Errorf("unauthorized: check your API key, body: %s", string(bodyBytes))
 		}
-		return fmt.Errorf("server returned status: %d", resp.StatusCode)
+		return fmt.Errorf("server returned status %d, body: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if !strings.Contains(contentType, "application/json") {
+		return fmt.Errorf("unexpected content-type %s", contentType)
 	}
 
 	var sessionResp SessionResponse
