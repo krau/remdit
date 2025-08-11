@@ -121,7 +121,7 @@ func run(ctx context.Context, fp string) {
 		return
 	}
 	logger.Debug("session ended")
-	if err := client.Close(websocket.StatusNormalClosure, "session ended"); err != nil {
+	if err := client.Close(websocket.StatusNormalClosure, ""); err != nil {
 		logger.Error("failed to close connection", "error", err)
 	}
 }

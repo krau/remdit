@@ -58,7 +58,6 @@ func (c *Client) CreateSession() error {
 	}
 	defer file.Close()
 
-	// 创建multipart表单
 	var buf bytes.Buffer
 	writer := multipart.NewWriter(&buf)
 
@@ -74,7 +73,6 @@ func (c *Client) CreateSession() error {
 
 	writer.Close()
 
-	// 发送POST请求
 	req, err := http.NewRequestWithContext(c.ctx, http.MethodPost, u.String(), &buf)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
@@ -111,7 +109,11 @@ func (c *Client) Connect() error {
 		return fmt.Errorf("failed to parse server URL: %w", err)
 	}
 	u.Path = fmt.Sprintf("/api/session/%s", c.sessionID)
-	c.conn, _, err = websocket.Dial(c.ctx, u.String(), nil)
+	c.conn, _, err = websocket.Dial(c.ctx, u.String(), &websocket.DialOptions{
+		OnPingReceived: func(ctx context.Context, payload []byte) bool {
+			return true
+		},
+	})
 	if err != nil {
 		return fmt.Errorf("failed to connect to websocket: %w", err)
 	}
