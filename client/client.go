@@ -21,32 +21,32 @@ import (
 )
 
 type Client struct {
-	ctx       context.Context
-	conn      *websocket.Conn
-	l         *log.Logger
-	serverURL string
-	editURL   string
-	sessionID string
-	filePath  string
+	ctx        context.Context
+	conn       *websocket.Conn
+	l          *log.Logger
+	serverConf config.Server
+	editURL    string
+	sessionID  string
+	filePath   string
 }
 
 func NewClient(ctx context.Context, serverConf config.Server, filePath string) *Client {
 	return &Client{
-		ctx:       ctx,
-		serverURL: serverConf.Addr,
-		filePath:  filePath,
-		l:         log.FromContext(ctx).WithPrefix("client"),
+		ctx:        ctx,
+		serverConf: serverConf,
+		filePath:   filePath,
+		l:          log.FromContext(ctx).WithPrefix("client"),
 	}
 }
 
 func (c *Client) CreateSession() error {
-	u, err := url.Parse(c.serverURL)
+	u, err := url.Parse(c.serverConf.Addr)
 	if err != nil {
 		return fmt.Errorf("failed to parse server URL: %w", err)
 	}
 	if !strings.HasPrefix(u.String(), "http") {
 		u, err = url.Parse("http://" + u.String())
-		c.serverURL = u.String()
+		c.serverConf.Addr = u.String()
 		if err != nil {
 			return fmt.Errorf("failed to parse server URL with http prefix: %w", err)
 		}
@@ -78,6 +78,9 @@ func (c *Client) CreateSession() error {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
+	if c.serverConf.Key != "" {
+		req.Header.Set("X-API-Key", c.serverConf.Key)
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -104,16 +107,22 @@ func (c *Client) GetEditURL() string {
 }
 
 func (c *Client) Connect() error {
-	u, err := url.Parse(c.serverURL)
+	u, err := url.Parse(c.serverConf.Addr)
 	if err != nil {
 		return fmt.Errorf("failed to parse server URL: %w", err)
 	}
 	u.Path = fmt.Sprintf("/api/session/%s", c.sessionID)
-	c.conn, _, err = websocket.Dial(c.ctx, u.String(), &websocket.DialOptions{
+	dialOption := &websocket.DialOptions{
 		OnPingReceived: func(ctx context.Context, payload []byte) bool {
 			return true
 		},
-	})
+	}
+	if c.serverConf.Key != "" {
+		header := http.Header{}
+		header.Set("X-API-Key", c.serverConf.Key)
+		dialOption.HTTPHeader = header
+	}
+	c.conn, _, err = websocket.Dial(c.ctx, u.String(), dialOption)
 	if err != nil {
 		return fmt.Errorf("failed to connect to websocket: %w", err)
 	}
