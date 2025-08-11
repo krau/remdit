@@ -5,7 +5,6 @@ go 1.24.5
 require (
 	github.com/charmbracelet/log v0.4.2
 	github.com/coder/websocket v1.8.13
-	github.com/duke-git/lancet/v2 v2.3.7
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 )

@@ -10,9 +10,9 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/coder/websocket"
-	"github.com/duke-git/lancet/v2/fileutil"
 	"github.com/krau/remdit/client"
 	"github.com/krau/remdit/config"
+	"github.com/krau/remdit/fileutil"
 	"github.com/spf13/cobra"
 )
 
