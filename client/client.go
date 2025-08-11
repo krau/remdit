@@ -61,7 +61,6 @@ func (c *Client) CreateSession() error {
 	var buf bytes.Buffer
 	writer := multipart.NewWriter(&buf)
 
-	// 添加文件字段
 	part, err := writer.CreateFormFile("document", filepath.Base(c.filePath))
 	if err != nil {
 		return fmt.Errorf("failed to create form file: %w", err)
@@ -89,6 +88,9 @@ func (c *Client) CreateSession() error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusUnauthorized {
+			return fmt.Errorf("unauthorized: check your API key")
+		}
 		return fmt.Errorf("server returned status: %d", resp.StatusCode)
 	}
 
