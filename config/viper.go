@@ -32,7 +32,6 @@ func LoadConfig(ctx context.Context) error {
 	viper.SetConfigFile("config.toml")
 	viper.AddConfigPath("/etc/remdit")
 	viper.AddConfigPath("$HOME/.remdit")
-	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	C = &Config{}
