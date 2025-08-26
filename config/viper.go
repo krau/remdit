@@ -29,7 +29,8 @@ func (s *Server) Valid() bool {
 var C *Config
 
 func LoadConfig(ctx context.Context) error {
-	viper.SetConfigFile("config.toml")
+	viper.SetConfigName("config")
+	viper.SetConfigType("toml")
 	viper.AddConfigPath("/etc/remdit")
 	viper.AddConfigPath("$HOME/.remdit")
 	viper.AutomaticEnv()
