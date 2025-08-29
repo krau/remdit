@@ -37,17 +37,13 @@ func LoadConfig(ctx context.Context) error {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	C = &Config{}
 	if err := viper.ReadInConfig(); err != nil {
-		if os.IsNotExist(err) {
-			if defaultServer == "" {
-				return err
-			}
-			C.Servers = []Server{}
-			C.Servers = append(C.Servers, Server{Addr: defaultServer})
-			log.FromContext(ctx).Debug("no config file found, using default server")
-			return nil
+		if defaultServer == "" {
+			return err
 		}
-		log.FromContext(ctx).Error("failed to read config", "err", err)
-		os.Exit(1)
+		C.Servers = []Server{}
+		C.Servers = append(C.Servers, Server{Addr: defaultServer})
+		log.FromContext(ctx).Debug("no config file found, using default server")
+		return nil
 	}
 	if err := viper.Unmarshal(C); err != nil {
 		log.FromContext(ctx).Error("failed to unmarshal config", "err", err)
