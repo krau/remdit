@@ -135,10 +135,10 @@ func (c *Client) Connect() error {
 		dialOption.HTTPHeader = header
 	}
 	c.conn, _, err = websocket.Dial(c.ctx, u.String(), dialOption)
-	c.conn.SetReadLimit(1024 * 1024 * 10) // 10MB
 	if err != nil {
 		return fmt.Errorf("failed to connect to websocket: %w", err)
 	}
+	c.conn.SetReadLimit(1024 * 1024 * 10) // 10MB
 	return nil
 }
 
